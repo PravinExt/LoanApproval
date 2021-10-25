@@ -70,6 +70,47 @@ namespace LoanApproval.Model
             }
         }
 
+        public Banker Get_Loan_by_id(int Loan_ID)
+        {
+            DBHelper dbHelper = new DBHelper();
+            try
+            {
+                Banker loaniobj = new Banker();
+                dbHelper.Connect(dbHelper.GetConnStr());
+
+                MySqlParameter[] loan_para = new MySqlParameter[1];
+                loan_para[0] = new MySqlParameter("Loan_ID", Loan_ID);
+                MySqlDataReader loanReader = dbHelper.ExecuteReader("Get_Loan_Info_By_Id", DBHelper.QueryType.StotedProcedure, loan_para);
+
+                while (loanReader.Read())
+                {
+                    loaniobj.LoanApplication_ID = int.Parse(loanReader["LoanApplication_ID"].ToString());
+                    loaniobj.Business_ID = int.Parse(loanReader["Business_ID"].ToString());
+                    loaniobj.Applicant_ID = int.Parse(loanReader["Applicant_ID"].ToString());
+                    loaniobj.Business_Name = loanReader["BusinessName"].ToString();
+                    loaniobj.Applicant_fname = loanReader["Applicant_fname"].ToString();
+                    loaniobj.Applicant_mname = loanReader["Applicant_mname"].ToString();
+                    loaniobj.Applicant_lname = loanReader["Applicant_lname"].ToString();
+                    loaniobj.LoanApplication_Amount = Convert.ToDecimal(loanReader["LoanAmount"].ToString());
+                    loaniobj.LoanApplication_Description = loanReader["LoanDescription"].ToString();
+                    loaniobj.LoanApplication_Status = int.Parse(loanReader["LoanStatus"].ToString());
+                    loaniobj.LoanApplication_Date = Convert.ToDateTime(loanReader["LoanApplication_Date"].ToString());
+                    loaniobj.LoanApplication_BankerComment = loanReader["LoanBanker_Comment"].ToString();
+                }
+
+                return loaniobj;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.DisConnect();
+                dbHelper = null;
+            }
+        }
+
         public bool Update_LoanInfo(Banker BankerPara, int id)
         {
             DBHelper dbHelper = new DBHelper();

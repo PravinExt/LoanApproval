@@ -87,7 +87,7 @@ namespace LoanApproval.Controllers
 
                     if (Loan_Status == 5 && result == true) //Loan_Status 5 i.e. Approved For Credit
                     {
-                        value.LoanApplication_ID = id;
+                        value = loandetail.Get_Loan_by_id(id);
 
                         qUrl = _configuration.GetSection("QueueURL").Value.ToString();
                         var JsonMessage = JsonConvert.SerializeObject(value);
