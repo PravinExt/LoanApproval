@@ -13,15 +13,44 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
- 
-- task: LambdaNETCoreDeploy@1
+- script: | 
+    dotnet restore LoanApproval.sln
+    ls
+  displayName: 'dotnet restore'
+
+
+- script: | 
+    dotnet build LoanApproval.sln
+    ls
+    cd /home/vsts/work/1/s/LoanApproval/bin/Debug/netcoreapp2.1/
+    ls -al
+    pwd
+  displayName: 'dotnet build'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '/home/vsts/work/1/s/UpdateLoanStatus/bin/Debug/netcoreapp2.1/'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
+- task: LambdaDeployFunction@1
   inputs:
     awsCredentials: 'awsconnection'
     regionName: 'ap-south-1'
-    command: 'deployServerless'
-    packageOnly: false
-    lambdaProjectPath: './LoanApproval'
-    stackName: 'LoanApproval'
-    s3Bucket: 'pblambdafunctions'
-    s3Prefix: 'LoanApproval'
-    additionalArgs: 'deploy-function LoanApproval --function-role azure-lambda-role'
+    deploymentMode: 'codeandconfiguration'
+    functionName: 'LoanApproval'
+    functionHandler: 'LoanApproval::LoanApproval.LambdaEntryPoint::FunctionHandlerAsync'
+    runtime: 'dotnetcore2.1'
+    codeLocation: 'localfile'
+    localZipFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    roleARN: 'azure-lambda-execution-role'
+    environment: |
+      Database=ApplicationSubmission
+      Port=3306
+      PWD=admin8910
+      Server=applicationsubmission.cikv7fwlsku8.ap-south-1.rds.amazonaws.com
+      UID=admin
+
+
