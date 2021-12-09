@@ -45,7 +45,7 @@ steps:
     runtime: 'dotnetcore2.1'
     codeLocation: 'localfile'
     localZipFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
-    roleARN: 'azure-lambda-execution-role'
+    roleARN: 'arn:aws:iam::618393550001:role/azure-lambda-role'
     environment: |
       Database=ApplicationSubmission
       Port=3306
