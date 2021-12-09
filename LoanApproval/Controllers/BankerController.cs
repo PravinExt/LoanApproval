@@ -89,7 +89,7 @@ namespace LoanApproval.Controllers
                     {
                         value = loandetail.Get_Loan_by_id(id);
 
-                        qUrl = _configuration.GetSection("QueueURL").Value.ToString();
+                        qUrl = Environment.GetEnvironmentVariable("QueueURL");
                         var JsonMessage = JsonConvert.SerializeObject(value);
 
                         var res = sqsClient.SendMessageAsync(qUrl, JsonMessage);
